@@ -64,7 +64,7 @@ const LandingPage: React.FC = () => {
 
           <p className="text-lg sm:text-xl text-surface-400 max-w-2xl mx-auto mb-10 animate-slide-up" style={{ animationDelay: '0.15s' }}>
             Create stunning invoices, quotations, proposals, receipts, and purchase orders
-            in under 5 minutes just chat with our AI assistant.
+            in under 5 minutes - just chat with our AI assistant.
           </p>
 
           {/* CTA */}
