@@ -74,7 +74,7 @@ const LandingPage: React.FC = () => {
               id="hero-cta"
               className="btn-primary text-lg !px-8 !py-4"
             >
-              Start Creating — Free
+              Start Creating
               <ArrowRight size={18} />
             </button>
             <Link to="/pricing" className="btn-outline text-lg !px-8 !py-4" id="hero-pricing">
