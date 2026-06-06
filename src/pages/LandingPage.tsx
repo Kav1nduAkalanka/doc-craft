@@ -481,7 +481,7 @@ const LandingPage: React.FC = () => {
           <div className="glass-card p-12 md:p-16 text-center border-brand-500/20 shadow-2xl shadow-brand-500/10">
             <h2 className="text-4xl md:text-5xl font-extrabold text-white mb-6 tracking-tight">Ready to build?</h2>
             <p className="text-xl text-surface-300 mb-10 max-w-xl mx-auto leading-relaxed">
-              Creating professional documents with DocCraft.
+              Create professional documents with DocCraft.
             </p>
             <motion.button
               whileHover={{ scale: 1.05 }}
