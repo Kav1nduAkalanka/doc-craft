@@ -7,6 +7,7 @@
 import { create } from 'zustand';
 import type { Quota, Subscription } from '../types';
 import * as billingApi from '../api/billing';
+import { useAuthStore } from './authStore';
 
 function isDemoMode(): boolean {
   return localStorage.getItem('doccraft_token') === 'demo_token_for_testing';
@@ -33,8 +34,7 @@ export const useQuotaStore = create<QuotaState>((set) => ({
 
   fetchQuota: async () => {
     if (isDemoMode()) {
-      const authStore = await import('./authStore');
-      const plan = authStore.useAuthStore.getState().user?.plan || 'free';
+      const plan = useAuthStore.getState().user?.plan || 'free';
       set({
         quota: {
           plan,
@@ -57,8 +57,7 @@ export const useQuotaStore = create<QuotaState>((set) => ({
 
   fetchSubscription: async () => {
     if (isDemoMode()) {
-      const authStore = await import('./authStore');
-      const plan = authStore.useAuthStore.getState().user?.plan;
+      const plan = useAuthStore.getState().user?.plan;
       if (plan === 'pro') {
         set({
           subscription: {

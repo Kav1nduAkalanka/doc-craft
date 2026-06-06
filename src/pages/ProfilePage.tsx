@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { User, Mail, Globe, Crown, CreditCard, Loader2, Save } from 'lucide-react';
+import { User, Mail, Globe, Crown, CreditCard, Loader2, Save, ArrowLeft } from 'lucide-react';
 import { useAuthStore } from '../store/authStore';
 import { useQuotaStore } from '../store/quotaStore';
 import * as usersApi from '../api/users';
@@ -42,6 +43,12 @@ const ProfilePage: React.FC = () => {
       transition={{ duration: 0.4, ease: "easeOut" }}
     >
       <div className="max-w-2xl mx-auto">
+        <div className="mb-6">
+          <Link to="/dashboard" className="inline-flex items-center gap-2 text-sm text-surface-400 hover:text-white transition-colors">
+            <ArrowLeft size={16} />
+            <span>Back to Dashboard</span>
+          </Link>
+        </div>
         <h1 className="text-2xl font-bold text-white mb-8 animate-fade-in">Profile Settings</h1>
 
         {/* User info card */}

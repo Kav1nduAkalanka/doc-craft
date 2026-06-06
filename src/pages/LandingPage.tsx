@@ -18,7 +18,7 @@ const LandingPage: React.FC = () => {
   useEffect(() => {
     const timer = setInterval(() => {
       setAnimationStep((prev) => (prev >= 6 ? 0 : prev + 1));
-    }, 500);
+    }, 1500);
     return () => clearInterval(timer);
   }, []);
 

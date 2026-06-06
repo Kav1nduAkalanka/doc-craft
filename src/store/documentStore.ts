@@ -13,6 +13,7 @@ import type {
 } from '../types';
 import { persist } from 'zustand/middleware';
 import * as documentsApi from '../api/documents';
+import { useChatStore } from './chatStore';
 
 function isDemoMode(): boolean {
   return localStorage.getItem('doccraft_token') === 'demo_token_for_testing';
@@ -92,8 +93,7 @@ export const useDocumentStore = create<DocumentState>()(
     set({ selectedTemplate: templateId });
     const state = get();
     if (state.documentId && isDemoMode()) {
-      const chatStore = await import('./chatStore');
-      const chatState = chatStore.useChatStore.getState();
+      const chatState = useChatStore.getState();
       if (chatState.collectedData) {
         set({ 
           previewHtml: renderTemplate(
@@ -176,8 +176,7 @@ export const useDocumentStore = create<DocumentState>()(
 
     // ── DEMO MODE — dynamically update and re-render ──
     if (isDemoMode()) {
-      const chatStore = await import('./chatStore');
-      const collectedData = chatStore.useChatStore.getState().collectedData;
+      const collectedData = useChatStore.getState().collectedData;
       
       const newLayoutState = { ...state.layoutState } as LayoutState;
       if (controls.color) set({ accentColor: controls.color as string });
@@ -215,7 +214,7 @@ export const useDocumentStore = create<DocumentState>()(
           collectedData, 
           newLayoutState, 
           updatedAccent,
-          chatStore.useChatStore.getState().documentType || 'invoice'
+          useChatStore.getState().documentType || 'invoice'
         );
         set({ previewHtml });
       }
