@@ -265,8 +265,8 @@ export const useDocumentStore = create<DocumentState>()(
         await html2pdf().from(container).set({
           margin: 10,
           filename: 'DocCraft-Demo-Invoice.pdf',
-          image: { type: 'png' },
-          html2canvas: { scale: 5, windowWidth: 800, width: 800, useCORS: true, letterRendering: true },
+          image: { type: 'jpeg', quality: 0.98 },
+          html2canvas: { scale: 2, windowWidth: 800, width: 800, useCORS: true, letterRendering: true },
           jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
         }).save();
         document.body.removeChild(container);
