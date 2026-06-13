@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useDocumentStore } from '../store/documentStore';
-import { Download, Sliders, Loader2, FileText, GripVertical, AlertTriangle } from 'lucide-react';
+import { Download, Sliders, Loader2, FileText, GripVertical } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useChatStore } from '../store/chatStore';
 import { useAuthStore } from '../store/authStore';
@@ -121,6 +121,7 @@ const DocumentPreview: React.FC = () => {
 
   const { readyToGenerate } = useChatStore();
   const { setShowUpgradeModal } = useQuotaStore();
+  const { user } = useAuthStore();
 
   const [items, setItems] = useState<string[]>([]);
   const [viewMode, setViewMode] = useState<'edit' | 'final'>('edit');
@@ -308,7 +309,9 @@ const DocumentPreview: React.FC = () => {
                   </div>
                   <h3 className="text-lg font-semibold text-white mb-2">Download Final PDF?</h3>
                   <p className="text-sm text-surface-400 mb-6">
-                    Make sure you've reviewed the document and are happy with all the details. This will consume 1 document from your daily quota.
+                    {user?.plan === 'pro' 
+                      ? "Make sure you've reviewed the document and are happy with all the details."
+                      : "Make sure you've reviewed the document and are happy with all the details. This will consume 1 document from your daily quota."}
                   </p>
                   <div className="flex gap-3 w-full">
                     <button
