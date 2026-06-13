@@ -316,29 +316,24 @@ export function renderTemplateSections(
   };
 
   // Apply template styles
-  let fontFamily = "'Inter', sans-serif";
   let borderStyle = `border-bottom: 2px solid ${accentColor};`;
   let tableHeaderBg = 'transparent';
   let headerTitleColor = accentColor;
   let accentBorder = `border-top: 2px solid ${accentColor}; border-bottom: 2px solid ${accentColor};`;
   
   if (templateId?.includes('_minimal')) {
-    fontFamily = "'Roboto', sans-serif";
     borderStyle = 'border-bottom: 1px solid #e2e8f0;';
     tableHeaderBg = '#f8fafc';
     headerTitleColor = '#1e293b';
     accentBorder = `border-top: 1px solid #e2e8f0; border-bottom: 1px solid #e2e8f0;`;
   } else if (templateId?.includes('_classic')) {
-    fontFamily = "'Times New Roman', serif";
     borderStyle = `border-bottom: 3px double ${accentColor};`;
     tableHeaderBg = `${accentColor}15`;
     accentBorder = `border-top: 3px double ${accentColor}; border-bottom: 3px double ${accentColor};`;
   }
 
   // Override with custom typography if set
-  if (layoutState?.fontFamily && layoutState.fontFamily !== 'default') {
-    fontFamily = layoutState.fontFamily;
-  }
+  // (fontFamily is applied by DocumentPreview wrapping container)
 
   const isQuotation = documentType === 'quotation';
   const isReceipt = documentType === 'receipt';

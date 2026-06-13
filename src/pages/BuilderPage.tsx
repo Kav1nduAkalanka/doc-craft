@@ -35,6 +35,7 @@ const BuilderPage: React.FC = () => {
   const handleBackToSelector = () => {
     resetChat();
     resetDocument();
+    navigate('/dashboard');
   };
 
   const location = useLocation();

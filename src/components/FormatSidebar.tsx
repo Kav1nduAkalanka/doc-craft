@@ -2,10 +2,15 @@ import React, { useState, useRef } from 'react';
 import { X, AlignLeft, AlignCenter, AlignRight, Eye, EyeOff, Type, Bold, GripVertical, Upload } from 'lucide-react';
 import { Reorder, motion, AnimatePresence } from 'framer-motion';
 import { useDocumentStore } from '../store/documentStore';
+import { useAuthStore } from '../store/authStore';
+import { useQuotaStore } from '../store/quotaStore';
 import type { Alignment, FontSize } from '../types';
 
 const FormatSidebar: React.FC = () => {
   const { isSidebarOpen, setSidebarOpen, updateLayout, accentColor, setAccentColor, layoutState } = useDocumentStore();
+  const { user } = useAuthStore();
+  const { setShowUpgradeModal } = useQuotaStore();
+  const isPro = user?.plan === 'pro';
   const [activeSection, setActiveSection] = useState<string>('header');
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -227,52 +232,67 @@ const FormatSidebar: React.FC = () => {
             </div>
 
             {/* Section tabs */}
-            <div className="p-3 border-b border-surface-700 max-h-[300px] overflow-y-auto">
-              <div className="mb-2 px-1 flex justify-between items-center">
-                <span className="text-[10px] uppercase font-bold text-surface-500 tracking-wider">Document Sections</span>
-                <span className="text-[10px] text-surface-600">(Drag to reorder)</span>
-              </div>
-              <Reorder.Group axis="y" values={orderedSections} onReorder={handleReorder} className="space-y-1 mb-4">
-                {orderedSections.map((sectionId) => (
-                  <Reorder.Item key={sectionId} value={sectionId}>
+            <div className="flex-1 overflow-y-auto relative">
+              {!isPro && (
+                <div className="absolute inset-0 z-10 bg-surface-900/80 backdrop-blur-sm flex flex-col items-center justify-center p-6 text-center">
+                  <div className="w-12 h-12 rounded-full bg-amber-500/10 flex items-center justify-center mb-3">
+                    <span className="text-amber-500">PRO</span>
+                  </div>
+                  <h4 className="text-white font-semibold mb-2">Pro Feature</h4>
+                  <p className="text-xs text-surface-400 mb-4">Customising layouts, colours, and uploading logos are available exclusively on the Pro plan.</p>
+                  <button onClick={() => setShowUpgradeModal(true)} className="px-4 py-2 bg-gradient-to-r from-amber-500 to-orange-500 text-white text-xs font-semibold rounded-lg hover:from-amber-400 hover:to-orange-400 transition-colors shadow-lg shadow-amber-500/20">
+                    Upgrade to Pro
+                  </button>
+                </div>
+              )}
+              
+              <div className="p-3 border-b border-surface-700">
+                <div className="mb-2 px-1 flex justify-between items-center">
+                  <span className="text-[10px] uppercase font-bold text-surface-500 tracking-wider">Document Sections</span>
+                  <span className="text-[10px] text-surface-600">(Drag to reorder)</span>
+                </div>
+                <Reorder.Group axis="y" values={orderedSections} onReorder={handleReorder} className="space-y-1 mb-4">
+                  {orderedSections.map((sectionId) => (
+                    <Reorder.Item key={sectionId} value={sectionId}>
+                      <button
+                        onClick={() => setActiveSection(sectionId)}
+                        className={`w-full flex items-center justify-between text-left px-3 py-2 rounded-lg text-xs font-medium transition-colors ${
+                          activeSection === sectionId
+                            ? 'bg-brand-500/15 text-brand-300 border border-brand-500/30'
+                            : 'text-surface-400 hover:text-surface-200 hover:bg-surface-800'
+                        }`}
+                      >
+                        {sectionsMap[sectionId]}
+                        <GripVertical size={12} className="text-surface-600 cursor-grab active:cursor-grabbing" />
+                      </button>
+                    </Reorder.Item>
+                  ))}
+                </Reorder.Group>
+
+                <div className="mb-2 px-1">
+                  <span className="text-[10px] uppercase font-bold text-surface-500 tracking-wider">Global Settings</span>
+                </div>
+                <div className="space-y-1">
+                  {globalSections.map((section) => (
                     <button
-                      onClick={() => setActiveSection(sectionId)}
-                      className={`w-full flex items-center justify-between text-left px-3 py-2 rounded-lg text-xs font-medium transition-colors ${
-                        activeSection === sectionId
+                      key={section.id}
+                      onClick={() => setActiveSection(section.id)}
+                      className={`w-full text-left px-3 py-2 rounded-lg text-xs font-medium transition-colors ${
+                        activeSection === section.id
                           ? 'bg-brand-500/15 text-brand-300 border border-brand-500/30'
                           : 'text-surface-400 hover:text-surface-200 hover:bg-surface-800'
                       }`}
                     >
-                      {sectionsMap[sectionId]}
-                      <GripVertical size={12} className="text-surface-600 cursor-grab active:cursor-grabbing" />
+                      {section.label}
                     </button>
-                  </Reorder.Item>
-                ))}
-              </Reorder.Group>
-
-              <div className="mb-2 px-1">
-                <span className="text-[10px] uppercase font-bold text-surface-500 tracking-wider">Global Settings</span>
+                  ))}
+                </div>
               </div>
-              <div className="space-y-1">
-                {globalSections.map((section) => (
-                  <button
-                    key={section.id}
-                    onClick={() => setActiveSection(section.id)}
-                    className={`w-full text-left px-3 py-2 rounded-lg text-xs font-medium transition-colors ${
-                      activeSection === section.id
-                        ? 'bg-brand-500/15 text-brand-300 border border-brand-500/30'
-                        : 'text-surface-400 hover:text-surface-200 hover:bg-surface-800'
-                    }`}
-                  >
-                    {section.label}
-                  </button>
-                ))}
-              </div>
-            </div>
 
-            {/* Controls */}
-            <div className="p-4 space-y-5">
-              {renderControls()}
+              {/* Controls */}
+              <div className="p-4 space-y-5">
+                {renderControls()}
+              </div>
             </div>
           </motion.div>
         </>
@@ -333,19 +353,21 @@ const FontSizeControl: React.FC<{ value: FontSize; onChange: (s: FontSize) => vo
 );
 
 const BoldControl: React.FC<{ value: boolean; onChange: (b: boolean) => void }> = ({ value, onChange }) => (
-  <div>
-    <label className="field-label flex items-center gap-1.5">
-      <Bold size={12} /> Bold
+  <div className="flex items-center justify-between">
+    <label className="field-label flex items-center gap-1.5 !mb-0">
+      <Bold size={12} /> Bold Text
     </label>
     <button
       onClick={() => onChange(!value)}
-      className={`px-4 py-2 rounded-lg text-xs font-semibold transition-colors ${
-        value
-          ? 'bg-brand-500/20 text-brand-300 border border-brand-500/40'
-          : 'bg-surface-800 text-surface-400 border border-surface-700 hover:bg-surface-700'
+      className={`relative w-10 h-5 rounded-full transition-colors ${
+        value ? 'bg-brand-500' : 'bg-surface-700'
       }`}
     >
-      {value ? 'Bold On' : 'Bold Off'}
+      <span
+        className={`absolute top-0.5 w-4 h-4 rounded-full bg-white shadow-md transition-transform ${
+          value ? 'left-5' : 'left-0.5'
+        }`}
+      />
     </button>
   </div>
 );

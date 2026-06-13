@@ -93,8 +93,7 @@ const Navbar: React.FC = () => {
     }
   };
 
-  // Hide Navbar completely on auth pages and builder to avoid overlapping with full-screen layouts
-  const hideOnRoutes = ['/login', '/register', '/password-reset', '/builder'];
+  const hideOnRoutes = ['/login', '/register', '/password-reset', '/builder', '/profile'];
   if (hideOnRoutes.includes(location.pathname)) {
     return null;
   }

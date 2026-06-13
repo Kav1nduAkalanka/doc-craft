@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { useDocumentStore } from '../store/documentStore';
-import { Download, Sliders, Loader2, FileText, GripVertical } from 'lucide-react';
+import { Download, Sliders, Loader2, FileText, GripVertical, AlertTriangle } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { useChatStore } from '../store/chatStore';
+import { useAuthStore } from '../store/authStore';
 import { ApiRequestError } from '../api/client';
 import { useQuotaStore } from '../store/quotaStore';
 import {
@@ -122,6 +124,7 @@ const DocumentPreview: React.FC = () => {
 
   const [items, setItems] = useState<string[]>([]);
   const [viewMode, setViewMode] = useState<'edit' | 'final'>('edit');
+  const [showConfirmExport, setShowConfirmExport] = useState(false);
 
   useEffect(() => {
     if (layoutState?.sectionOrder) {
@@ -152,7 +155,8 @@ const DocumentPreview: React.FC = () => {
     }
   };
 
-  const handleExport = async () => {
+  const confirmExport = async () => {
+    setShowConfirmExport(false);
     try {
       await exportPdf();
     } catch (err) {
@@ -215,7 +219,7 @@ const DocumentPreview: React.FC = () => {
             Format
           </button>
           <button
-            onClick={handleExport}
+            onClick={() => setShowConfirmExport(true)}
             disabled={isExporting}
             id="btn-export-pdf"
             className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-emerald-600 text-white text-xs font-semibold rounded-lg hover:bg-emerald-500 transition-colors disabled:opacity-50"
@@ -261,9 +265,11 @@ const DocumentPreview: React.FC = () => {
                     {items.map((id) => (
                       previewSections[id] ? <SortableSection key={id} id={id} html={previewSections[id]} isFinalPreview={viewMode === 'final'} /> : null
                     ))}
-                    <div style={{ textAlign: 'center', padding: '16px 0', borderTop: '1px solid #e2e8f0', marginTop: '16px' }}>
-                      <p style={{ fontSize: '10px', color: '#cbd5e1' }}>Generated with DocCraft · doccraft.app</p>
-                    </div>
+                    {useAuthStore.getState().user?.plan !== 'pro' && (
+                      <div style={{ textAlign: 'center', padding: '16px 0', borderTop: '1px solid #e2e8f0', marginTop: '16px' }}>
+                        <p style={{ fontSize: '10px', color: '#cbd5e1' }}>Generated with DocCraft · doccraft.app</p>
+                      </div>
+                    )}
                   </div>
                 </SortableContext>
               </DndContext>
@@ -278,6 +284,52 @@ const DocumentPreview: React.FC = () => {
           </div>
         )}
       </div>
+
+      <AnimatePresence>
+        {showConfirmExport && (
+          <>
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+              onClick={() => setShowConfirmExport(false)}
+            >
+              <motion.div
+                initial={{ scale: 0.95, opacity: 0, y: 10 }}
+                animate={{ scale: 1, opacity: 1, y: 0 }}
+                exit={{ scale: 0.95, opacity: 0, y: 10 }}
+                onClick={(e) => e.stopPropagation()}
+                className="bg-surface-900 border border-surface-700 p-6 rounded-2xl shadow-2xl max-w-sm w-full"
+              >
+                <div className="flex flex-col items-center text-center">
+                  <div className="w-12 h-12 rounded-full bg-brand-500/10 flex items-center justify-center mb-4 text-brand-400">
+                    <Download size={24} />
+                  </div>
+                  <h3 className="text-lg font-semibold text-white mb-2">Download Final PDF?</h3>
+                  <p className="text-sm text-surface-400 mb-6">
+                    Make sure you've reviewed the document and are happy with all the details. This will consume 1 document from your daily quota.
+                  </p>
+                  <div className="flex gap-3 w-full">
+                    <button
+                      onClick={() => setShowConfirmExport(false)}
+                      className="flex-1 px-4 py-2 bg-surface-800 text-surface-300 text-sm font-semibold rounded-lg hover:bg-surface-700 transition-colors"
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      onClick={confirmExport}
+                      className="flex-1 px-4 py-2 bg-brand-600 text-white text-sm font-semibold rounded-lg hover:bg-brand-500 transition-colors"
+                    >
+                      Confirm
+                    </button>
+                  </div>
+                </div>
+              </motion.div>
+            </motion.div>
+          </>
+        )}
+      </AnimatePresence>
     </div>
   );
 };
