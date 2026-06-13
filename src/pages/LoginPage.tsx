@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate, useLocation, Link } from "react-router-dom";
 import { motion } from "framer-motion";
-import { Eye, EyeOff, Mail, FileText, Play } from "lucide-react";
+import { Eye, EyeOff, Mail, FileText } from "lucide-react";
 import { useAuthStore } from "../store/authStore";
 import { Button, Input, Label, Checkbox } from "../components/ui";
 import { AnimatedAuthBackground } from "../components/AnimatedAuthBackground";
@@ -75,7 +75,7 @@ const LoginPage: React.FC = () => {
                 placeholder="anna@gmail.com"
                 value={email}
                 autoComplete="off"
-                onChange={(e) => { setEmail(e.target.value); clearError(); }}
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) => { setEmail(e.target.value); clearError(); }}
                 onFocus={() => setIsTyping(true)}
                 onBlur={() => setIsTyping(false)}
                 required
@@ -90,7 +90,7 @@ const LoginPage: React.FC = () => {
                   type={showPassword ? "text" : "password"}
                   placeholder="••••••••"
                   value={password}
-                  onChange={(e) => { setPassword(e.target.value); clearError(); }}
+                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => { setPassword(e.target.value); clearError(); }}
                   required
                 />
                 <button

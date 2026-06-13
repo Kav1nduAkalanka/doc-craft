@@ -6,7 +6,7 @@ import { useChatStore } from '../store/chatStore';
 import { useDocumentStore } from '../store/documentStore';
 import { useQuotaStore } from '../store/quotaStore';
 import type { DocumentType } from '../types';
-import DocumentTypeSelector from '../components/DocumentTypeSelector';
+
 import ChatPanel from '../components/ChatPanel';
 import DocumentPreview from '../components/DocumentPreview';
 import TemplateSelector from '../components/TemplateSelector';
@@ -41,17 +41,17 @@ const BuilderPage: React.FC = () => {
   const autoSelectType = location.state?.autoSelectType as DocumentType | undefined;
 
   useEffect(() => {
-    if (autoSelectType && !sessionId) {
+    if (autoSelectType) {
       window.history.replaceState({}, document.title);
       handleSelectDocType(autoSelectType);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [autoSelectType, sessionId]);
+  }, [autoSelectType]);
 
   // Auto-generate removed to allow user to review the summary first
 
   // Redirect to dashboard if no document is selected and no session exists
-  if (!sessionId) {
+  if (!sessionId && !autoSelectType) {
     return <Navigate to="/dashboard" replace />;
   }
 

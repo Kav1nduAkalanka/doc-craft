@@ -11,6 +11,7 @@ import { setToken, clearToken } from '../api/client';
 interface AuthState {
   user: User | null;
   isAuthenticated: boolean;
+  isGuest: boolean;
   isLoading: boolean;
   error: string | null;
 
@@ -42,11 +43,15 @@ interface AuthState {
   
   /** Verify if a stored token is still valid on app load */
   checkAuth: () => Promise<void>;
+  
+  /** Toggle demo plan for development purposes */
+  toggleDemoPlan: () => void;
 }
 
 export const useAuthStore = create<AuthState>((set, get) => ({
   user: null,
   isAuthenticated: false,
+  isGuest: false,
   isLoading: false,
   error: null,
 
@@ -130,6 +135,15 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     } catch {
       clearToken();
       set({ user: null, isAuthenticated: false });
+    }
+  },
+
+  toggleDemoPlan: () => {
+    const user = get().user;
+    if (user) {
+      set({
+        user: { ...user, plan: user.plan === 'pro' ? 'free' : 'pro' }
+      });
     }
   },
 }));

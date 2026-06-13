@@ -15,8 +15,6 @@ import type {
   DocumentType,
   Template,
   LayoutState,
-  Alignment,
-  FontSize,
   GenerateDocumentResponse,
 } from '../types';
 import * as documentsApi from '../api/documents';
@@ -83,7 +81,7 @@ export const useDocumentStore = create<DocumentState>()(
       selectTemplate: (templateId: string) => {
         set({ selectedTemplate: templateId });
         const state = get();
-        if (state.documentId && state.layoutState) {
+        if (state.layoutState) {
           const chatStore = useChatStore.getState();
           const slots = chatStore.collectedData || chatStore.collectedSlots || {};
           const docType = chatStore.documentType || 'invoice';
@@ -96,7 +94,7 @@ export const useDocumentStore = create<DocumentState>()(
       setAccentColor: (color: string) => {
         set({ accentColor: color });
         const state = get();
-        if (state.documentId && state.layoutState) {
+        if (state.layoutState) {
           // Re-render the template with the new accent color directly
           const chatStore = useChatStore.getState();
           const slots = chatStore.collectedData || chatStore.collectedSlots || {};
@@ -170,7 +168,7 @@ export const useDocumentStore = create<DocumentState>()(
 
       updateLayout: async (section, controls) => {
         const state = get();
-        if (!state.documentId || !state.layoutState) return;
+        if (!state.layoutState) return;
 
         // 1. Optimistic Local Update
         const mappedControls: Record<string, any> = {};
@@ -223,16 +221,17 @@ export const useDocumentStore = create<DocumentState>()(
         set({ layoutState: newLayoutState, previewHtml: newHtml, previewSections: newSections });
 
         // 2. Background Sync
-        try {
-          await documentsApi.updateLayout(state.documentId, { section, controls });
-        } catch (err: unknown) {
-          console.error("Failed to sync layout to backend:", err);
+        if (state.documentId && !state.documentId.startsWith('local_')) {
+          try {
+            await documentsApi.updateLayout(state.documentId, { section, controls });
+          } catch (err: unknown) {
+            console.error("Failed to sync layout to backend:", err);
+          }
         }
       },
 
       updateContent: async (slot, value) => {
         const state = get();
-        if (!state.documentId) return;
 
         // 1. Optimistic Local Update
         const chatStore = useChatStore.getState();
@@ -258,10 +257,12 @@ export const useDocumentStore = create<DocumentState>()(
         set({ previewHtml: newHtml, previewSections: newSections });
 
         // 2. Background Sync
-        try {
-          await documentsApi.updateContent(state.documentId, { slot, value });
-        } catch (err: unknown) {
-          console.error("Failed to sync content to backend:", err);
+        if (state.documentId && !state.documentId.startsWith('local_')) {
+          try {
+            await documentsApi.updateContent(state.documentId, { slot, value });
+          } catch (err: unknown) {
+            console.error("Failed to sync content to backend:", err);
+          }
         }
       },
 
@@ -306,7 +307,7 @@ export const useDocumentStore = create<DocumentState>()(
 
           // 2. Local PDF Generation (always runs unless quota is exceeded)
           const html2pdfModule = await import('html2pdf.js');
-          const html2pdf = html2pdfModule.default || html2pdfModule;
+          const html2pdf = (html2pdfModule.default || html2pdfModule) as any;
 
           const element = document.querySelector('.preview-container');
           if (!element) throw new Error("Preview container not found on screen");

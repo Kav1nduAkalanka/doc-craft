@@ -4,7 +4,7 @@ import { Crown, ArrowRight } from 'lucide-react';
 import { PricingCard } from './PricingCard';
 import { useAuthStore } from '../store/authStore';
 import { useQuotaStore } from '../store/quotaStore';
-import { ArrowDown } from 'lucide-react';
+
 
 const PricingSection: React.FC = () => {
   const { isAuthenticated, user } = useAuthStore();

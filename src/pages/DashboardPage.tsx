@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Plus, Crown, FileText, Settings, Sparkles } from 'lucide-react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Crown, FileText, Settings, Sparkles } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import { useAuthStore } from '../store/authStore';
 import { useQuotaStore } from '../store/quotaStore';
 import UpgradeModal from '../components/UpgradeModal';

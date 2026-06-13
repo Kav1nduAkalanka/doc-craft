@@ -1,5 +1,5 @@
 import * as React from "react";
-import { motion, HTMLMotionProps } from "framer-motion";
+import { motion, type HTMLMotionProps } from "framer-motion";
 
 // Define the props for the component
 interface AnimatedFeatureCardProps extends Omit<HTMLMotionProps<"div">, "title"> {

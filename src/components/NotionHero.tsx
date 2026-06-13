@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence, useScroll, useTransform } from 'framer-motion';
-import { Link } from 'react-router-dom';
+
 
 // ─────────────────────────────────────────────────────────────────────────────
 // DATA — Bill templates that cycle in the animated invoice preview.

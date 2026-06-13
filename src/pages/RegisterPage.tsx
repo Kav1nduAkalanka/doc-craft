@@ -105,7 +105,7 @@ const RegisterPage: React.FC = () => {
                 placeholder="you@email.com"
                 value={email}
                 autoComplete="off"
-                onChange={(e) => { setEmail(e.target.value); clearError(); setLocalError(""); }}
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) => { setEmail(e.target.value); clearError(); setLocalError(""); }}
                 onFocus={() => setIsTyping(true)}
                 onBlur={() => setIsTyping(false)}
                 required
@@ -120,7 +120,7 @@ const RegisterPage: React.FC = () => {
                   type={showPassword ? "text" : "password"}
                   placeholder="Min. 8 characters"
                   value={password}
-                  onChange={(e) => { setPassword(e.target.value); setLocalError(""); }}
+                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => { setPassword(e.target.value); setLocalError(""); }}
                   required
                   minLength={8}
                 />
@@ -142,7 +142,7 @@ const RegisterPage: React.FC = () => {
                   type={showPassword ? "text" : "password"}
                   placeholder="••••••••"
                   value={confirmPassword}
-                  onChange={(e) => { setConfirmPassword(e.target.value); setLocalError(""); }}
+                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => { setConfirmPassword(e.target.value); setLocalError(""); }}
                   required
                 />
               </div>

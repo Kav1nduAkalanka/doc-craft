@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useDocumentStore } from '../store/documentStore';
-import { Download, Sliders, Loader2, FileText, Sparkles, GripVertical } from 'lucide-react';
+import { Download, Sliders, Loader2, FileText, GripVertical } from 'lucide-react';
 import { useChatStore } from '../store/chatStore';
 import { ApiRequestError } from '../api/client';
 import { useQuotaStore } from '../store/quotaStore';
@@ -117,7 +117,7 @@ const DocumentPreview: React.FC = () => {
     updateLayout,
   } = useDocumentStore();
 
-  const { readyToGenerate, collectedData, summary } = useChatStore();
+  const { readyToGenerate } = useChatStore();
   const { setShowUpgradeModal } = useQuotaStore();
 
   const [items, setItems] = useState<string[]>([]);
@@ -248,7 +248,13 @@ const DocumentPreview: React.FC = () => {
                   <div
                     className="preview-container p-8"
                     style={{
-                      fontFamily: layoutState?.fontFamily !== 'default' ? layoutState?.fontFamily : "'Inter', sans-serif",
+                      fontFamily: layoutState?.fontFamily && layoutState.fontFamily !== 'default'
+                        ? layoutState.fontFamily
+                        : useDocumentStore.getState().selectedTemplate?.includes('_minimal')
+                          ? "'Roboto', sans-serif"
+                          : useDocumentStore.getState().selectedTemplate?.includes('_classic')
+                            ? "'Times New Roman', serif"
+                            : "'Inter', sans-serif",
                       color: '#1e293b'
                     }}
                   >

@@ -3,6 +3,7 @@ import { Check, Lock } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { useDocumentStore } from '../store/documentStore';
 import { useAuthStore } from '../store/authStore';
+import { useChatStore } from '../store/chatStore';
 import { renderTemplate } from '../utils/templateRenderer';
 import type { Template } from '../types';
 
@@ -62,6 +63,10 @@ const TemplateSelector: React.FC = () => {
                               businessName: 'Business Name',
                               clientName: 'Client Name',
                               invoiceNumber: 'INV-123',
+                              quoteNumber: 'QT-123',
+                              proposalNumber: 'PRP-123',
+                              poNumber: 'PO-123',
+                              receiptNumber: 'RCP-123',
                               lineItems: [{ description: 'Service', quantity: 1, unitPrice: 100, total: 100 }],
                               subtotal: 100,
                               totalDue: 100,
@@ -73,7 +78,8 @@ const TemplateSelector: React.FC = () => {
                               showNotes: true,
                               sectionOrder: ['header', 'client_details', 'line_items', 'total', 'notes'],
                             }, 
-                            accentColor
+                            accentColor,
+                            useChatStore.getState().documentType || 'invoice'
                           ) 
                         }}
                       />
