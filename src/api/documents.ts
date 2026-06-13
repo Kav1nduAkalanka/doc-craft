@@ -36,10 +36,9 @@ export function getTemplates(documentType: DocumentType): Promise<TemplatesRespo
   return get<TemplatesResponse>(`/templates?document_type=${documentType}`);
 }
 
-/** POST /documents/{id}/export/pdf — Generate and download PDF */
-export function exportPdf(documentId: string): Promise<Blob> {
-  return apiRequest<Blob>(`/documents/${documentId}/export/pdf`, {
+/** POST /documents/{id}/export/pdf — Track export on server (PDF is generated client-side) */
+export function exportPdf(documentId: string): Promise<{ message: string }> {
+  return apiRequest<{ message: string }>(`/documents/${documentId}/export/pdf`, {
     method: 'POST',
-    responseType: 'blob',
   });
 }

@@ -4,38 +4,49 @@
  */
 
 import { create } from 'zustand';
-import type { User, GuestSession } from '../types';
+import type { User } from '../types';
 import * as authApi from '../api/auth';
 import { setToken, clearToken } from '../api/client';
 
 interface AuthState {
   user: User | null;
   isAuthenticated: boolean;
-  isGuest: boolean;
-  guestSession: GuestSession | null;
   isLoading: boolean;
   error: string | null;
 
-  // Actions
+  // ─── Actions ────────────────────────────────────────────────────────────────
+
+  /** Authenticate a user with email and password, setting the session token */
   login: (email: string, password: string) => Promise<void>;
+  
+  /** Register a new user and automatically log them in */
   register: (email: string, password: string) => Promise<void>;
+  
+  /** Invalidate the current session and clear local tokens */
   logout: () => Promise<void>;
-  guestLogin: () => Promise<void>;
+  
+  /** Redirect the browser to the Google OAuth consent screen */
   googleAuth: () => void;
+  
+  /** Request a password reset email */
   passwordReset: (email: string) => Promise<string>;
-  demoLogin: () => void;
-  toggleDemoPlan: () => void;
+  
+  /** Manually set the user object in state */
   setUser: (user: User) => void;
+  
+  /** Manually set the auth token and mark as authenticated */
   setToken: (token: string) => void;
+  
+  /** Clear any authentication errors from state */
   clearError: () => void;
+  
+  /** Verify if a stored token is still valid on app load */
   checkAuth: () => Promise<void>;
 }
 
 export const useAuthStore = create<AuthState>((set, get) => ({
   user: null,
   isAuthenticated: false,
-  isGuest: false,
-  guestSession: null,
   isLoading: false,
   error: null,
 
@@ -47,8 +58,6 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       set({
         user: response.user,
         isAuthenticated: true,
-        isGuest: false,
-        guestSession: null,
         isLoading: false,
       });
     } catch (err: unknown) {
@@ -81,27 +90,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     set({
       user: null,
       isAuthenticated: false,
-      isGuest: false,
-      guestSession: null,
     });
-  },
-
-  guestLogin: async () => {
-    set({ isLoading: true, error: null });
-    try {
-      const session = await authApi.guestLogin();
-      setToken(session.session_token);
-      set({
-        isAuthenticated: true,
-        isGuest: true,
-        guestSession: session,
-        isLoading: false,
-      });
-    } catch (err: unknown) {
-      const message = err instanceof Error ? err.message : 'Guest session failed.';
-      set({ error: message, isLoading: false });
-      throw err;
-    }
   },
 
   googleAuth: () => {
@@ -122,38 +111,6 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     }
   },
 
-  demoLogin: () => {
-    const demoUser: User = {
-      user_id: 'demo-user-001',
-      email: 'demo@doccraft.app',
-      full_name: 'Demo User',
-      auth_provider: 'email',
-      plan: 'free',
-      timezone: 'Asia/Colombo',
-    };
-    setToken('demo_token_for_testing');
-    set({
-      user: demoUser,
-      isAuthenticated: true,
-      isGuest: false,
-      guestSession: null,
-      isLoading: false,
-      error: null,
-    });
-  },
-
-  toggleDemoPlan: () => {
-    const currentUser = get().user;
-    if (currentUser) {
-      set({
-        user: {
-          ...currentUser,
-          plan: currentUser.plan === 'free' ? 'pro' : 'free',
-        }
-      });
-    }
-  },
-
   setUser: (user: User) => set({ user }),
 
   setToken: (token: string) => {
@@ -169,7 +126,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     
     try {
       const user = await authApi.getMe();
-      set({ user, isAuthenticated: true, isGuest: false });
+      set({ user, isAuthenticated: true });
     } catch {
       clearToken();
       set({ user: null, isAuthenticated: false });

@@ -1,3 +1,10 @@
+/**
+ * BackgroundEffects.tsx
+ * 
+ * Global background animation component. Renders a full-screen canvas
+ * with drifting particles connected by lines, layered with a subtle noise grid
+ * and floating colorful orbs powered by Framer Motion.
+ */
 import React, { useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
 

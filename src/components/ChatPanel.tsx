@@ -1,6 +1,7 @@
 import React, { useRef, useEffect, useState } from 'react';
 import { Send, RotateCcw, FileCheck, Loader2 } from 'lucide-react';
 import { useChatStore } from '../store/chatStore';
+import { useDocumentStore } from '../store/documentStore';
 import ChatMessage from './ChatMessage';
 import SpellCorrectionBanner from './SpellCorrectionBanner';
 import ProgressIndicator from './ProgressIndicator';
@@ -18,9 +19,12 @@ const ChatPanel: React.FC = () => {
     error,
     sendMessage,
     confirmCorrection,
-    fetchSummary,
     resetChat,
+    sessionId,
+    documentType,
   } = useChatStore();
+
+  const { generateDocument, isGenerating } = useDocumentStore();
 
   const [input, setInput] = useState('');
   const messagesEndRef = useRef<HTMLDivElement>(null);
@@ -69,12 +73,17 @@ const ChatPanel: React.FC = () => {
         <div className="flex gap-1.5">
           {readyToGenerate && (
             <button
-              onClick={() => fetchSummary()}
-              id="btn-summary"
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-emerald-600/80 text-white text-xs font-medium rounded-lg hover:bg-emerald-500 transition-colors"
+              onClick={() => {
+                if (sessionId && documentType && collectedSlots) {
+                  generateDocument(sessionId, documentType, collectedSlots);
+                }
+              }}
+              id="btn-generate"
+              disabled={isGenerating}
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-emerald-600/80 text-white text-xs font-medium rounded-lg hover:bg-emerald-500 transition-colors disabled:opacity-50"
             >
-              <FileCheck size={13} />
-              Review
+              {isGenerating ? <Loader2 size={13} className="animate-spin" /> : <FileCheck size={13} />}
+              {isGenerating ? 'Generating...' : 'Generate'}
             </button>
           )}
           <button

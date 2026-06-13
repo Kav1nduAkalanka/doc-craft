@@ -5,10 +5,16 @@ import {
   FileText,
   ArrowRight,
   CheckCircle2,
-  Sparkles,
   Download,
+  Receipt,
+  Calculator,
+  Briefcase,
+  ShoppingCart
 } from 'lucide-react';
 import { useAuthStore } from '../store/authStore';
+import type { DocumentType } from '../types';
+import { NotionHero } from '../components/NotionHero';
+import { TemplateCarousel } from '../components/TemplateCarousel';
 
 const LandingPage: React.FC = () => {
   const { isAuthenticated } = useAuthStore();
@@ -23,10 +29,14 @@ const LandingPage: React.FC = () => {
   }, []);
 
   const handleGetStarted = () => {
+    document.getElementById('document-types')?.scrollIntoView({ behavior: 'smooth' });
+  };
+
+  const handleSelectType = (type: DocumentType) => {
     if (isAuthenticated) {
-      navigate('/builder');
+      navigate('/builder', { state: { autoSelectType: type } });
     } else {
-      navigate('/register');
+      navigate('/login', { state: { autoSelectType: type } });
     }
   };
 
@@ -40,160 +50,145 @@ const LandingPage: React.FC = () => {
       transition={{ duration: 0.4, ease: "easeOut" }}
     >
       {/* Hero */}
-      <section className="relative pt-32 pb-20 px-4 overflow-hidden">
-        {/* Decorative grid */}
-        <div className="absolute inset-0 opacity-[0.03]"
-          style={{
-            backgroundImage: `radial-gradient(circle, rgba(255,255,255,0.5) 1px, transparent 1px)`,
-            backgroundSize: '32px 32px',
-          }}
-        />
+      <NotionHero />
 
-        <div className="max-w-5xl mx-auto text-center relative z-10">
-          {/* Badge */}
-          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-brand-500/10 border border-brand-500/20 mb-6 animate-fade-in">
-            <Sparkles size={14} className="text-brand-400" />
-            <span className="text-xs font-medium text-brand-300">AI-Powered Document Builder</span>
-          </div>
+      {/* Templates Showcase */}
+      <TemplateCarousel />
 
-          <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-extrabold text-white mb-6 leading-tight animate-slide-up">
-            Professional documents,
-            <br />
-            <span className="gradient-text">built by conversation</span>
-          </h1>
+      {/* Document types */}
+      <section className="py-24 px-4 relative" id="document-types">
+        <div className="absolute inset-0 bg-surface-950/40 backdrop-blur-3xl" />
+        <div className="max-w-5xl mx-auto relative z-10">
+          <motion.div 
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: "-100px" }}
+            transition={{ duration: 0.6 }}
+            className="text-center mb-16"
+          >
+            <h2 className="text-3xl sm:text-4xl font-bold text-white mb-4 tracking-tight">Every document you need</h2>
+            <p className="text-surface-400 max-w-lg mx-auto">
+              All the essential business documents, professionally designed and AI-assisted.
+            </p>
+          </motion.div>
 
-          <p className="text-lg sm:text-xl text-surface-400 max-w-2xl mx-auto mb-10 animate-slide-up" style={{ animationDelay: '0.15s' }}>
-            Create stunning invoices, quotations, proposals, receipts, and purchase orders
-            in under 5 minutes - just chat with our AI assistant.
-          </p>
-
-          {/* CTA */}
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-4 animate-slide-up" style={{ animationDelay: '0.3s' }}>
-            <button
-              onClick={handleGetStarted}
-              id="hero-cta"
-              className="btn-primary text-lg !px-8 !py-4"
+          <motion.div 
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, margin: "-100px" }}
+            variants={{
+              hidden: { opacity: 0 },
+              visible: { opacity: 1, transition: { staggerChildren: 0.1 } }
+            }}
+            className="grid grid-cols-1 md:grid-cols-3 gap-6"
+          >
+            {/* Invoice - Large */}
+            <motion.div
+              variants={{ hidden: { opacity: 0, y: 30 }, visible: { opacity: 1, y: 0, transition: { type: "spring", stiffness: 300, damping: 24 } } }}
+              onClick={() => handleSelectType('invoice')}
+              whileHover={{ y: -5 }}
+              whileTap={{ scale: 0.98 }}
+              className="md:col-span-2 glass-card p-8 group hover:bg-white/[0.04] hover:border-brand-500/50 hover:shadow-[0_0_40px_-10px_rgba(99,102,241,0.2)] transition-all duration-300 overflow-hidden relative flex flex-col justify-center min-h-[240px] cursor-pointer border border-white/5"
             >
-              Start Creating
-              <ArrowRight size={18} />
-            </button>
-            <Link to="/pricing" className="btn-outline text-lg !px-8 !py-4" id="hero-pricing">
-              View Pricing
-            </Link>
-          </div>
-
-          <p className="text-xs text-surface-500 mt-4 animate-fade-in" style={{ animationDelay: '0.5s' }}>
-            No credit card required · 3 free documents per day
-          </p>
-        </div>
-
-        {/* Hero visual — mock preview */}
-        <div className="max-w-4xl mx-auto mt-16 animate-slide-up" style={{ animationDelay: '0.4s' }}>
-          <div className="glass-card overflow-hidden">
-            <div className="bg-surface-800/80 px-4 py-2 border-b border-surface-700/50 flex items-center gap-2">
-              <div className="flex gap-1.5">
-                <div className="w-3 h-3 rounded-full bg-red-500/60"></div>
-                <div className="w-3 h-3 rounded-full bg-yellow-500/60"></div>
-                <div className="w-3 h-3 rounded-full bg-green-500/60"></div>
-              </div>
-              <span className="text-xs text-surface-500 ml-2">DocCraft — Builder</span>
-            </div>
-            <div className="flex h-[340px]">
-              {/* Chat side */}
-              <div className="w-2/5 border-r border-surface-700/50 p-4 flex flex-col gap-3 transition-all duration-300">
-                <div className="chat-bubble-ai animate-slide-up">
-                  <p className="text-xs">Let's build your invoice! What's your business name?</p>
+              <div className="absolute top-0 right-0 w-64 h-64 bg-brand-500/10 blur-3xl rounded-full translate-x-1/2 -translate-y-1/2 group-hover:bg-brand-500/20 transition-all duration-500" />
+              <div className="relative z-10 flex justify-between items-start">
+                <div>
+                  <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-brand-500 to-purple-600 flex items-center justify-center text-white shadow-lg shadow-brand-500/25 mb-6 group-hover:scale-110 group-hover:rotate-3 transition-transform duration-300">
+                    <FileText size={32} />
+                  </div>
+                  <h3 className="text-3xl font-bold text-white mb-3 tracking-tight">Invoice</h3>
+                  <p className="text-surface-400 max-w-md text-lg leading-relaxed">Professional, compliant invoices with automated tax and subtotal calculations.</p>
                 </div>
-                {animationStep >= 1 && (
-                  <div className="chat-bubble-user animate-slide-up">
-                    <p className="text-xs">Jane Designs</p>
-                  </div>
-                )}
-                {animationStep >= 2 && (
-                  <div className="chat-bubble-ai animate-slide-up">
-                    <p className="text-xs">Great! What invoice number should we use?</p>
-                  </div>
-                )}
-                {animationStep >= 3 && (
-                  <div className="chat-bubble-user animate-slide-up">
-                    <p className="text-xs">INV-0042</p>
-                  </div>
-                )}
-                {animationStep >= 4 && (
-                  <div className="chat-bubble-ai animate-slide-up">
-                    <p className="text-xs">Got it — INV-0042. What's the invoice date?</p>
-                  </div>
-                )}
-                {animationStep >= 5 && (
-                  <div className="chat-bubble-user animate-slide-up">
-                    <p className="text-xs">2026-06-06</p>
-                  </div>
-                )}
-                {animationStep < 5 && animationStep > 0 && (
-                  <div className="flex gap-1 px-3 py-2 mt-1">
-                    <div className="w-1.5 h-1.5 rounded-full bg-surface-500 animate-bounce" style={{ animationDelay: '0ms' }} />
-                    <div className="w-1.5 h-1.5 rounded-full bg-surface-500 animate-bounce" style={{ animationDelay: '150ms' }} />
-                    <div className="w-1.5 h-1.5 rounded-full bg-surface-500 animate-bounce" style={{ animationDelay: '300ms' }} />
-                  </div>
-                )}
-              </div>
-              {/* Preview side */}
-              <div className="w-3/5 p-6 flex items-center justify-center bg-surface-800/30">
-                <div className="w-full max-w-xs bg-white rounded-lg shadow-xl p-5 text-gray-800 transition-all duration-500 relative overflow-hidden">
-                  {/* Sweep highlight effect on update */}
-                  {animationStep > 0 && <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/40 to-transparent w-[200%] animate-slide-right opacity-30 mix-blend-overlay pointer-events-none" key={animationStep} />}
-
-                  <div className="flex justify-between items-start mb-4">
-                    <div className="transition-opacity duration-300">
-                      <h3 className={`text-sm font-bold ${animationStep >= 1 ? 'text-indigo-600' : 'text-gray-300'}`}>
-                        {animationStep >= 1 ? 'Jane Designs' : 'Business Name'}
-                      </h3>
-                      <p className={`text-[9px] ${animationStep >= 1 ? 'text-gray-400' : 'text-gray-200'}`}>
-                        {animationStep >= 1 ? 'jane@janedesigns.com' : 'email@business.com'}
-                      </p>
-                    </div>
-                    <div className="text-right transition-opacity duration-300">
-                      <p className="text-[10px] font-bold text-gray-800">INVOICE</p>
-                      <p className={`text-[9px] ${animationStep >= 3 ? 'text-gray-500' : 'text-gray-300'}`}>
-                        {animationStep >= 3 ? '#INV-0042' : '#INV-XXXX'}
-                      </p>
-                      <p className={`text-[9px] mt-0.5 ${animationStep >= 5 ? 'text-gray-500' : 'text-gray-300'}`}>
-                        {animationStep >= 5 ? 'Date: 2026-06-06' : 'Date: —'}
-                      </p>
-                    </div>
-                  </div>
-                  <div className="border-t border-gray-100 pt-2 mb-3">
-                    <p className="text-[9px] text-gray-500">Bill To</p>
-                    <p className="text-[10px] font-medium">Acme Corporation</p>
-                  </div>
-                  <table className="w-full text-[9px] mb-3">
-                    <thead>
-                      <tr className="border-b border-gray-100">
-                        <th className="text-left py-1 text-gray-500 font-medium">Item</th>
-                        <th className="text-right py-1 text-gray-500 font-medium">Qty</th>
-                        <th className="text-right py-1 text-gray-500 font-medium">Price</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      <tr>
-                        <td className="py-1">Web Design</td>
-                        <td className="text-right py-1">1</td>
-                        <td className="text-right py-1">LKR 1,500</td>
-                      </tr>
-                      <tr>
-                        <td className="py-1">SEO Setup</td>
-                        <td className="text-right py-1">1</td>
-                        <td className="text-right py-1">LKR 800</td>
-                      </tr>
-                    </tbody>
-                  </table>
-                  <div className="border-t border-gray-100 pt-2 text-right">
-                    <p className="text-[10px] font-bold text-indigo-600">Total: LKR 2,300.00</p>
-                  </div>
+                <div className="w-12 h-12 rounded-full bg-white/5 flex items-center justify-center text-white opacity-0 group-hover:opacity-100 transform translate-x-4 group-hover:translate-x-0 transition-all duration-300 backdrop-blur-md">
+                  <ArrowRight size={20} className="text-brand-400" />
                 </div>
               </div>
-            </div>
-          </div>
+            </motion.div>
+
+            {/* Quotation */}
+            <motion.div
+              variants={{ hidden: { opacity: 0, y: 30 }, visible: { opacity: 1, y: 0, transition: { type: "spring", stiffness: 300, damping: 24 } } }}
+              onClick={() => handleSelectType('quotation')}
+              whileHover={{ y: -5 }}
+              whileTap={{ scale: 0.98 }}
+              className="glass-card p-6 group hover:bg-white/[0.04] hover:border-emerald-500/50 hover:shadow-[0_0_40px_-10px_rgba(16,185,129,0.2)] transition-all duration-300 cursor-pointer overflow-hidden relative border border-white/5"
+            >
+              <div className="absolute bottom-0 right-0 w-32 h-32 bg-emerald-500/10 blur-2xl rounded-full translate-x-1/2 translate-y-1/2 group-hover:bg-emerald-500/20 transition-all duration-500" />
+              <div className="flex justify-between items-start mb-4">
+                <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-600 flex items-center justify-center text-white shadow-lg group-hover:scale-110 group-hover:-rotate-3 transition-transform duration-300 relative z-10">
+                  <Calculator className="w-6 h-6" />
+                </div>
+                <div className="w-8 h-8 rounded-full bg-white/5 flex items-center justify-center text-white opacity-0 group-hover:opacity-100 transform translate-x-2 group-hover:translate-x-0 transition-all duration-300">
+                  <ArrowRight size={14} className="text-emerald-400" />
+                </div>
+              </div>
+              <h3 className="text-lg font-bold text-white mb-2 relative z-10">Quotation</h3>
+              <p className="text-sm text-surface-400 leading-relaxed relative z-10">Clear price estimates to win clients over.</p>
+            </motion.div>
+
+            {/* Proposal */}
+            <motion.div
+              variants={{ hidden: { opacity: 0, y: 30 }, visible: { opacity: 1, y: 0, transition: { type: "spring", stiffness: 300, damping: 24 } } }}
+              onClick={() => handleSelectType('proposal')}
+              whileHover={{ y: -5 }}
+              whileTap={{ scale: 0.98 }}
+              className="glass-card p-6 group hover:bg-white/[0.04] hover:border-pink-500/50 hover:shadow-[0_0_40px_-10px_rgba(236,72,153,0.2)] transition-all duration-300 cursor-pointer overflow-hidden relative border border-white/5"
+            >
+              <div className="absolute top-0 right-0 w-32 h-32 bg-pink-500/10 blur-2xl rounded-full translate-x-1/2 -translate-y-1/2 group-hover:bg-pink-500/20 transition-all duration-500" />
+              <div className="flex justify-between items-start mb-4">
+                <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-pink-500 to-rose-600 flex items-center justify-center text-white shadow-lg group-hover:scale-110 group-hover:rotate-3 transition-transform duration-300 relative z-10">
+                  <Briefcase className="w-6 h-6" />
+                </div>
+                <div className="w-8 h-8 rounded-full bg-white/5 flex items-center justify-center text-white opacity-0 group-hover:opacity-100 transform translate-x-2 group-hover:translate-x-0 transition-all duration-300">
+                  <ArrowRight size={14} className="text-pink-400" />
+                </div>
+              </div>
+              <h3 className="text-lg font-bold text-white mb-2 relative z-10">Proposal</h3>
+              <p className="text-sm text-surface-400 leading-relaxed relative z-10">Detailed project scope and pricing.</p>
+            </motion.div>
+
+            {/* Receipt */}
+            <motion.div
+              variants={{ hidden: { opacity: 0, y: 30 }, visible: { opacity: 1, y: 0, transition: { type: "spring", stiffness: 300, damping: 24 } } }}
+              onClick={() => handleSelectType('receipt')}
+              whileHover={{ y: -5 }}
+              whileTap={{ scale: 0.98 }}
+              className="glass-card p-6 group hover:bg-white/[0.04] hover:border-amber-500/50 hover:shadow-[0_0_40px_-10px_rgba(245,158,11,0.2)] transition-all duration-300 cursor-pointer overflow-hidden relative border border-white/5"
+            >
+              <div className="absolute bottom-0 right-0 w-32 h-32 bg-amber-500/10 blur-2xl rounded-full translate-x-1/2 translate-y-1/2 group-hover:bg-amber-500/20 transition-all duration-500" />
+              <div className="flex justify-between items-start mb-4">
+                <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-amber-500 to-orange-600 flex items-center justify-center text-white shadow-lg group-hover:scale-110 group-hover:-rotate-3 transition-transform duration-300 relative z-10">
+                  <Receipt className="w-6 h-6" />
+                </div>
+                <div className="w-8 h-8 rounded-full bg-white/5 flex items-center justify-center text-white opacity-0 group-hover:opacity-100 transform translate-x-2 group-hover:translate-x-0 transition-all duration-300">
+                  <ArrowRight size={14} className="text-amber-400" />
+                </div>
+              </div>
+              <h3 className="text-lg font-bold text-white mb-2 relative z-10">Receipt</h3>
+              <p className="text-sm text-surface-400 leading-relaxed relative z-10">Instantly generate proof of payment.</p>
+            </motion.div>
+
+            {/* Purchase Order */}
+            <motion.div
+              variants={{ hidden: { opacity: 0, y: 30 }, visible: { opacity: 1, y: 0, transition: { type: "spring", stiffness: 300, damping: 24 } } }}
+              onClick={() => handleSelectType('purchase_order')}
+              whileHover={{ y: -5 }}
+              whileTap={{ scale: 0.98 }}
+              className="glass-card p-6 group hover:bg-white/[0.04] hover:border-cyan-500/50 hover:shadow-[0_0_40px_-10px_rgba(6,182,212,0.2)] transition-all duration-300 cursor-pointer overflow-hidden relative border border-white/5"
+            >
+              <div className="absolute top-0 right-0 w-32 h-32 bg-cyan-500/10 blur-2xl rounded-full translate-x-1/2 -translate-y-1/2 group-hover:bg-cyan-500/20 transition-all duration-500" />
+              <div className="flex justify-between items-start mb-4">
+                <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-cyan-500 to-blue-600 flex items-center justify-center text-white shadow-lg group-hover:scale-110 group-hover:rotate-3 transition-transform duration-300 relative z-10">
+                  <ShoppingCart className="w-6 h-6" />
+                </div>
+                <div className="w-8 h-8 rounded-full bg-white/5 flex items-center justify-center text-white opacity-0 group-hover:opacity-100 transform translate-x-2 group-hover:translate-x-0 transition-all duration-300">
+                  <ArrowRight size={14} className="text-cyan-400" />
+                </div>
+              </div>
+              <h3 className="text-lg font-bold text-white mb-2 relative z-10">Purchase Order</h3>
+              <p className="text-sm text-surface-400 leading-relaxed relative z-10">Streamline procurement with clear purchase details.</p>
+            </motion.div>
+          </motion.div>
         </div>
       </section>
 
@@ -389,90 +384,6 @@ const LandingPage: React.FC = () => {
           </div>
         </div>
       </section>
-
-      {/* Document types */}
-      <section className="py-24 px-4 relative" id="document-types">
-        <div className="absolute inset-0 bg-surface-950/40 backdrop-blur-3xl" />
-        <div className="max-w-5xl mx-auto relative z-10">
-          <div className="text-center mb-16">
-            <h2 className="text-3xl sm:text-4xl font-bold text-white mb-4 tracking-tight">Every document you need</h2>
-            <p className="text-surface-400 max-w-lg mx-auto">
-              All the essential business documents, professionally designed and AI-assisted.
-            </p>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {/* Invoice - Large */}
-            <motion.div
-              whileHover={{ y: -5 }}
-              className="md:col-span-2 glass-card p-8 group hover:bg-white/[0.08] hover:border-brand-500/50 hover:shadow-glow transition-all duration-300 overflow-hidden relative flex flex-col justify-center min-h-[240px] cursor-pointer"
-            >
-              <div className="absolute top-0 right-0 w-64 h-64 bg-brand-500/10 blur-3xl rounded-full translate-x-1/2 -translate-y-1/2 group-hover:bg-brand-500/20 transition-all duration-500" />
-              <div className="relative z-10">
-                <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-brand-500 to-purple-600 flex items-center justify-center text-white shadow-lg shadow-brand-500/25 mb-6 group-hover:scale-110 group-hover:rotate-3 transition-transform duration-300">
-                  <FileText size={32} />
-                </div>
-                <h3 className="text-3xl font-bold text-white mb-3 tracking-tight">Invoice</h3>
-                <p className="text-surface-400 max-w-md text-lg leading-relaxed">Professional, compliant invoices with automated tax and subtotal calculations.</p>
-              </div>
-            </motion.div>
-
-            {/* Quotation */}
-            <motion.div
-              whileHover={{ y: -5 }}
-              className="glass-card p-6 group hover:bg-white/[0.08] hover:border-emerald-500/50 transition-all duration-300 cursor-pointer overflow-hidden relative"
-            >
-              <div className="absolute bottom-0 right-0 w-32 h-32 bg-emerald-500/10 blur-2xl rounded-full translate-x-1/2 translate-y-1/2 group-hover:bg-emerald-500/20 transition-all duration-500" />
-              <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-600 flex items-center justify-center text-white shadow-lg mb-4 group-hover:scale-110 group-hover:-rotate-3 transition-transform duration-300 relative z-10">
-                <FileText className="w-6 h-6" />
-              </div>
-              <h3 className="text-lg font-bold text-white mb-2 relative z-10">Quotation</h3>
-              <p className="text-sm text-surface-400 leading-relaxed relative z-10">Clear price estimates to win clients over.</p>
-            </motion.div>
-
-            {/* Proposal */}
-            <motion.div
-              whileHover={{ y: -5 }}
-              className="glass-card p-6 group hover:bg-white/[0.08] hover:border-pink-500/50 transition-all duration-300 cursor-pointer overflow-hidden relative"
-            >
-              <div className="absolute top-0 right-0 w-32 h-32 bg-pink-500/10 blur-2xl rounded-full translate-x-1/2 -translate-y-1/2 group-hover:bg-pink-500/20 transition-all duration-500" />
-              <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-pink-500 to-rose-600 flex items-center justify-center text-white shadow-lg mb-4 group-hover:scale-110 group-hover:rotate-3 transition-transform duration-300 relative z-10">
-                <FileText className="w-6 h-6" />
-              </div>
-              <h3 className="text-lg font-bold text-white mb-2 relative z-10">Proposal</h3>
-              <p className="text-sm text-surface-400 leading-relaxed relative z-10">Detailed project scope and pricing.</p>
-            </motion.div>
-
-            {/* Receipt */}
-            <motion.div
-              whileHover={{ y: -5 }}
-              className="glass-card p-6 group hover:bg-white/[0.08] hover:border-amber-500/50 transition-all duration-300 cursor-pointer overflow-hidden relative"
-            >
-              <div className="absolute bottom-0 right-0 w-32 h-32 bg-amber-500/10 blur-2xl rounded-full translate-x-1/2 translate-y-1/2 group-hover:bg-amber-500/20 transition-all duration-500" />
-              <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-amber-500 to-orange-600 flex items-center justify-center text-white shadow-lg mb-4 group-hover:scale-110 group-hover:-rotate-3 transition-transform duration-300 relative z-10">
-                <FileText className="w-6 h-6" />
-              </div>
-              <h3 className="text-lg font-bold text-white mb-2 relative z-10">Receipt</h3>
-              <p className="text-sm text-surface-400 leading-relaxed relative z-10">Instantly generate proof of payment.</p>
-            </motion.div>
-
-            {/* Purchase Order */}
-            <motion.div
-              whileHover={{ y: -5 }}
-              className="glass-card p-6 group hover:bg-white/[0.08] hover:border-cyan-500/50 transition-all duration-300 cursor-pointer overflow-hidden relative"
-            >
-              <div className="absolute top-0 right-0 w-32 h-32 bg-cyan-500/10 blur-2xl rounded-full translate-x-1/2 -translate-y-1/2 group-hover:bg-cyan-500/20 transition-all duration-500" />
-              <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-cyan-500 to-blue-600 flex items-center justify-center text-white shadow-lg mb-4 group-hover:scale-110 group-hover:rotate-3 transition-transform duration-300 relative z-10">
-                <FileText className="w-6 h-6" />
-              </div>
-              <h3 className="text-lg font-bold text-white mb-2 relative z-10">Purchase Order</h3>
-              <p className="text-sm text-surface-400 leading-relaxed relative z-10">Streamline procurement with clear purchase details.</p>
-            </motion.div>
-          </div>
-        </div>
-      </section>
-
-      {/* CTA */}
       <section className="py-32 px-4 relative overflow-hidden" id="cta-section">
         <div className="absolute inset-0 bg-brand-900/10" />
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[400px] bg-brand-500/20 blur-[120px] rounded-full pointer-events-none" />
@@ -481,7 +392,7 @@ const LandingPage: React.FC = () => {
           <div className="glass-card p-12 md:p-16 text-center border-brand-500/20 shadow-2xl shadow-brand-500/10">
             <h2 className="text-4xl md:text-5xl font-extrabold text-white mb-6 tracking-tight">Ready to build?</h2>
             <p className="text-xl text-surface-300 mb-10 max-w-xl mx-auto leading-relaxed">
-              Create professional documents with DocCraft.
+              Creating professional documents with DocCraft.
             </p>
             <motion.button
               whileHover={{ scale: 1.05 }}

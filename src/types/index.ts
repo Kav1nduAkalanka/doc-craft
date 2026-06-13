@@ -44,13 +44,6 @@ export interface RegisterResponse {
   created_at: string;
 }
 
-export interface GuestSession {
-  session_token: string;
-  quota: {
-    allowed: number;
-    used: number;
-  };
-}
 
 // ─── Quota & Subscription ─────────────────────
 
@@ -127,6 +120,7 @@ export interface ChatRequest {
   current_field: string;
   message: string;
   conversation_history: ChatMessage[];
+  collected_slots?: Record<string, unknown>;
 }
 
 export interface ChatResponse {

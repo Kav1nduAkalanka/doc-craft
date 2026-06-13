@@ -8,6 +8,9 @@ import type { ApiError } from '../types';
 
 const BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3001/v1';
 
+/** Re-exported so other modules (e.g. auth.ts) can reference the base without re-declaring. */
+export const API_BASE_URL = BASE_URL;
+
 /** Get the auth token from localStorage */
 function getToken(): string | null {
   return localStorage.getItem('doccraft_token');

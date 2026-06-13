@@ -29,13 +29,12 @@ const QuotaBar: React.FC = () => {
       {quota.plan === 'free' && (
         <div className="w-full h-1 bg-surface-800 rounded-full overflow-hidden">
           <div
-            className={`h-full rounded-full transition-all duration-500 ${
-              isExhausted
+            className={`h-full rounded-full transition-all duration-500 ${isExhausted
                 ? 'bg-red-500'
                 : isLow
                   ? 'bg-amber-500'
                   : 'bg-brand-500'
-            }`}
+              }`}
             style={{ width: `${Math.min(percent, 100)}%` }}
           />
         </div>

@@ -1,28 +1,32 @@
 /**
  * Quota Store — Zustand
  * Manages quota status and subscription info.
- * Includes DEMO MODE with mock quota data.
  */
 
 import { create } from 'zustand';
 import type { Quota, Subscription } from '../types';
 import * as billingApi from '../api/billing';
-import { useAuthStore } from './authStore';
-
-function isDemoMode(): boolean {
-  return localStorage.getItem('doccraft_token') === 'demo_token_for_testing';
-}
 
 interface QuotaState {
   quota: Quota | null;
   subscription: Subscription | null;
   showUpgradeModal: boolean;
   isLoading: boolean;
+  // ─── Actions ────────────────────────────────────────────────────────────────
 
+  /** Fetch the current daily quota usage and limits for the user */
   fetchQuota: () => Promise<void>;
+  
+  /** Fetch the user's active subscription status from Stripe */
   fetchSubscription: () => Promise<void>;
+  
+  /** Redirect the user to a Stripe Checkout session to upgrade their plan */
   checkout: (plan: 'pro_monthly' | 'pro_annual') => Promise<void>;
+  
+  /** Redirect the user to the Stripe Billing Portal to manage their subscription */
   openPortal: () => Promise<void>;
+  
+  /** Toggle the visibility of the "Upgrade to Pro" modal */
   setShowUpgradeModal: (show: boolean) => void;
 }
 
@@ -33,20 +37,6 @@ export const useQuotaStore = create<QuotaState>((set) => ({
   isLoading: false,
 
   fetchQuota: async () => {
-    if (isDemoMode()) {
-      const plan = useAuthStore.getState().user?.plan || 'free';
-      set({
-        quota: {
-          plan,
-          daily_limit: plan === 'pro' ? 9999 : 3,
-          used_today: 1,
-          remaining: plan === 'pro' ? 9998 : 2,
-          resets_at: new Date(new Date().setHours(24, 0, 0, 0)).toISOString(),
-        },
-      });
-      return;
-    }
-
     try {
       const quota = await billingApi.getQuota();
       set({ quota });
@@ -56,24 +46,6 @@ export const useQuotaStore = create<QuotaState>((set) => ({
   },
 
   fetchSubscription: async () => {
-    if (isDemoMode()) {
-      const plan = useAuthStore.getState().user?.plan;
-      if (plan === 'pro') {
-        set({
-          subscription: {
-            plan: 'pro_monthly',
-            status: 'active',
-            current_period_end: new Date(new Date().setMonth(new Date().getMonth() + 1)).toISOString(),
-            stripe_customer_id: 'demo_cus_123',
-
-          }
-        });
-      } else {
-        set({ subscription: null });
-      }
-      return;
-    }
-
     try {
       const subscription = await billingApi.getSubscription();
       set({ subscription });
@@ -83,11 +55,6 @@ export const useQuotaStore = create<QuotaState>((set) => ({
   },
 
   checkout: async (plan: 'pro_monthly' | 'pro_annual') => {
-    if (isDemoMode()) {
-      alert(`Demo mode: Would redirect to Stripe checkout for "${plan}" plan.`);
-      return;
-    }
-
     set({ isLoading: true });
     try {
       const response = await billingApi.createCheckout(plan);
@@ -98,11 +65,6 @@ export const useQuotaStore = create<QuotaState>((set) => ({
   },
 
   openPortal: async () => {
-    if (isDemoMode()) {
-      alert('Demo mode: Would redirect to Stripe billing portal.');
-      return;
-    }
-
     try {
       const response = await billingApi.createPortal();
       window.location.href = response.portal_url;

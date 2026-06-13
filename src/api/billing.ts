@@ -6,14 +6,14 @@
 import { get, post } from './client';
 import type { Quota, Subscription, CheckoutResponse, PortalResponse } from '../types';
 
-/** GET /quota — Get daily generation quota status */
+/** GET /billing/quota — Get daily generation quota status */
 export function getQuota(): Promise<Quota> {
-  return get<Quota>('/quota');
+  return get<Quota>('/billing/quota');
 }
 
-/** GET /subscription — Get subscription status */
+/** GET /billing/subscription — Get subscription status */
 export function getSubscription(): Promise<Subscription> {
-  return get<Subscription>('/subscription');
+  return get<Subscription>('/billing/subscription');
 }
 
 /** POST /billing/checkout — Create Stripe checkout session */

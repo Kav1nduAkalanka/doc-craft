@@ -90,12 +90,12 @@ const FormatSidebar: React.FC = () => {
             <AlignmentControl value={(layoutState?.client_details_alignment as any) || 'left'} onChange={handleAlignment} />
             <FontSizeControl value={(layoutState?.client_details_fontSize as any) || layoutState?.fontSize || 'medium'} onChange={handleFontSize} />
             <BoldControl value={(layoutState?.client_details_bold as any) || layoutState?.bold || false} onChange={handleBold} />
-            <VisibilityControl visible={true} onChange={handleVisibility} label="Show client details" />
+            <VisibilityControl visible={(layoutState?.showClientDetails as boolean) ?? true} onChange={handleVisibility} label="Show client details" />
           </>
         );
       case 'line_items':
         return (
-          <VisibilityControl visible={true} onChange={(v) => updateLayout('line_items', { showQuantityColumn: v })} label="Show quantity column" />
+          <VisibilityControl visible={(layoutState?.showQuantityColumn as boolean) ?? true} onChange={(v) => updateLayout('line_items', { showQuantityColumn: v })} label="Show quantity column" />
         );
       case 'notes':
         return (
